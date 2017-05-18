@@ -1,0 +1,67 @@
+// komponentide ja väljaviikude määratlemine
+#include "FastLED.h"
+#define LED_PIN     3
+#define NUM_LEDS    30
+#define BRIGHTNESS  64
+#define LED_TYPE    WS2812B
+#define COLOR_ORDER GRB
+#define UPDATES_PER_SECOND 100
+// // tundlikuse määratlemine
+int tundlikkus = 10;
+int piir;
+const byte nupud[] = {5, 6, 7, 8, 9};
+byte punane = 0;
+byte sinine = 0;
+byte roheline = 0;
+// nuppude määratlemine
+void setup() { 
+  for (int i=0; i < 5; i++){
+      pinMode(nupud[i], INPUT_PULLUP);
+    delay( 3000 ); // power-up safety delay
+    FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+    FastLED.setBrightness(  BRIGHTNESS );
+}}
+//tundlikkuse ja nuppude määratlemine
+void loop() {
+  static uint8_t hue;
+  if (digitalRead(nupud[0])==LOW) {
+       punane = 1;
+       sinine = 0;
+       roheline = 0;
+  }
+  else if (digitalRead(nupud[1])==LOW) {
+       punane = 0;
+       sinine = 1;
+       roheline = 0;
+  }
+  else if (digitalRead(nupud[2])==LOW) {
+       punane = 0;
+       sinine = 0;
+       roheline = 1;
+}
+  // helisignaali määramine väljaviigule
+  int sensorValue = analogRead(A0);
+  // punaste LED tulede vilkumine muusikarütmis
+  if (punane == 1){
+	for( int i = 0; i < NUM_LEDS; i++) {
+		if (sensorValue > i*tundlikkus) leds[i] = CRGB::Blue; 
+		else leds[i] = CRGB::Black;
+    }
+    }
+  // sinine LED tulede vilkumine muusikarütmis
+  if (sinine == 1){
+    for( int i = 0; i < NUM_LEDS; i++) {
+		if (sensorValue > i*tundlikkus) leds[i] = CRGB::Blue; 
+		else leds[i] = CRGB::Black;
+    }
+    }
+  // roheline LED tulede vilkumine muusikarütmis
+  if (roheline == 1){
+    for( int i = 0; i < NUM_LEDS; i++) {
+        if (sensorValue > i*tundlikkus) leds[i] = CRGB::Green; 
+        else leds[i] = CRGB::Black;
+    }
+    }
+  FastLED.show();
+  delay(100);
+}
